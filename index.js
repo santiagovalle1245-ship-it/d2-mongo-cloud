@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 // 1. Conectar a la base de datos
 connectDB();
 
-// 2. Definir el "Molde" del Usuario AQUÍ MISMO (Sin carpetas extra)
+// 2. Definir el "Molde" del Usuario AQUÍ MISMO 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
