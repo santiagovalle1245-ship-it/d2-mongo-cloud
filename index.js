@@ -1,14 +1,16 @@
 const express = require('express');
 const connectDB = require('./db');
-const mongoose = require('mongoose'); // Importamos mongoose aquí también
+const mongoose = require('mongoose');
+
+// ---> CAMBIO 1: Importar tu archivo de rutas aquí arriba
+const tiposUsuarioRutas = require('./routes/TiposUsusario'); 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 1. Conectar a la base de datos
+// Conectar a la base de datos
 connectDB();
 
-// 2. Definir el "Molde" del Usuario AQUÍ MISMO 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -16,28 +18,24 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-// Creamos el modelo usando ese molde
 const User = mongoose.model('User', userSchema);
 
 // Middleware para entender JSON
 app.use(express.json());
+app.use(express.static('public'));
 
-// Ruta básica de prueba
-app.get('/', (req, res) => {
-    res.send('Hello, MongoDB! Todo funcionando.');
-});
+// ---> CAMBIO 2: Decirle al servidor que use tus rutas cuando visiten '/api/tipos-usuario'
+app.use('/api/tipos-usuario', tiposUsuarioRutas);
 
-// 3. Ruta para CREAR el usuario y mandarlo a la Base de Datos
+
+// Ruta para CREAR el usuario original
 app.post('/users', async (req, res) => {
     try {
-        console.log("Intentando guardar usuario:", req.body); // Para ver en consola qué llega
-        
-        const newUser = new User(req.body); // Crea el usuario con lo que le envíes
-        await newUser.save(); // Lo guarda en MongoDB Atlas
-        
-        res.status(201).json(newUser); // Te responde con el usuario creado
+        console.log("Intentando guardar usuario:", req.body);
+        const newUser = new User(req.body);
+        await newUser.save();
+        res.status(201).json(newUser);
         console.log("¡Usuario guardado con éxito!");
-        
     } catch (error) {
         console.error("Error al guardar:", error);
         res.status(500).json({ error: 'Error al crear usuario', details: error.message });
